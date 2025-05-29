@@ -1,7 +1,18 @@
 // src/components/ProductoCard.js
 import React from 'react';
 
-const ProductoCard = ({ producto }) => {
+export default function ProductoCard({ producto, inWish, add, toggle }) {
+  /* Alias: adaptamos los nombres de tu objeto
+     a los que usa productoService (id, img, title, price, cat) */
+  const prod = {
+    ...producto,
+    id:    producto.id,
+    img:   producto.imagenUrl,
+    title: producto.nombre,
+    price: producto.precio,
+    cat:   producto.categoriaNombre,
+  };
+
   return (
     <div style={{
       border: '1px solid #ccc',
@@ -10,13 +21,20 @@ const ProductoCard = ({ producto }) => {
       margin: '10px',
       width: '250px'
     }}>
-      <img src={producto.imagenUrl} alt={producto.nombre} style={{ width: '100%' }} />
-      <h3>{producto.nombre}</h3>
+      <img src={prod.img} alt={prod.title} style={{ width: '100%' }} />
+      <h3>{prod.title}</h3>
       <p>{producto.descripcion}</p>
-      <p><strong>${producto.precio}</strong></p>
-      <p>Categoría: {producto.categoriaNombre}</p>
+      <p><strong>${prod.price}</strong></p>
+      <p>Categoría: {prod.cat}</p>
+
+      {/* Botones de acción */}
+      <button onClick={() => add(prod)}>Agregar al carrito</button>
+      <button
+        style={{ marginLeft: '6px' }}
+        onClick={() => toggle(prod)}
+      >
+        {inWish ? 'Quitar ♥' : 'Wishlist ♥'}
+      </button>
     </div>
   );
-};
-
-export default ProductoCard;
+}

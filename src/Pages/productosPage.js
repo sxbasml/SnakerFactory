@@ -1,27 +1,40 @@
-// src/pages/ProductosPage.js
-import React, { useEffect, useState } from 'react';
-import { obtenerProductos } from '../Services/productoService';
+import React, { useState } from 'react';
+import { PRODUCTS } from '../Services/productoService';
 import ProductoCard from '../Components/productoCard';
 
-const ProductosPage = () => {
-  const [productos, setProductos] = useState([]);
-
-  useEffect(() => {
-    obtenerProductos()
-      .then(data => setProductos(data))
-      .catch(error => console.error('Error al obtener productos:', error));
-  }, []);
+export default function ProductosPage({ add, toggle, wish }) {
+  const [cat, setCat] = useState('all');
+  const cats = ['all', 'tenis', 'ropa', 'accesorios', 'gorras'];
+  const list = cat === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.categoriaNombre === cat);
 
   return (
-    <div>
-      <h2>Productos Disponibles</h2>
-      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {productos.map(producto => (
-          <ProductoCard key={producto.slug} producto={producto} />
+    <section className="view">
+      <h3 className="section-title">Catálogo</h3>
+
+      <div className="filters">
+        {cats.map(c => (
+          <button
+            key={c}
+            className={`filter ${cat === c ? 'active' : ''}`}
+            onClick={() => setCat(c)}
+          >
+            {c}
+          </button>
         ))}
       </div>
-    </div>
-  );
-};
 
-export default ProductosPage;
+      <div className="grid">
+        {list.map(p => (
+          <ProductoCard
+            key={p.id}
+            producto={p}                              
+            inWish={wish.some(w => w.id === p.id)}
+            add={add}
+            toggle={toggle}
+          />
+        ))}
+      </div>
+    </section>
+  );
+
+}
