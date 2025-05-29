@@ -1,6 +1,7 @@
 // src/App.js
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import NavBar        from './Components/navBar';
 import HomePage      from './Pages/homePage';
@@ -10,34 +11,52 @@ import WishlistPage  from './Pages/wishlistPage';
 import LoginPage     from './Pages/loginPage';
 
 import {
-  cartService,
-  wishService
-} from './Services/productoService';
-import { userService } from './Services/userService';
+  addToCart,
+  removeFromCart,
+  clearCart,
+} from './redux/slices/cartSlice';
+import {
+  toggleWish,
+} from './redux/slices/wishSlice';
+import {
+  loginUsuario,
+  registerUsuario,
+} from './redux/actions/userActions';
+import {
+  logoutUser,
+} from './redux/slices/userSlice';
 
 import './index.css';
 
 export default function App() {
-  /* ---------- estado global ---------- */
-  const [cart,  setCart ] = useState(cartService.list());
-  const [wish,  setWish ] = useState(wishService.list());
-  const [user,  setUser ] = useState(userService.current());
+  const dispatch = useDispatch();
 
-  /* ---------- handlers ---------- */
-  const addToCart   = prod => setCart(cartService.add(prod));
-  const removeCart  = id   => setCart(cartService.remove(id));
-  const toggleWish  = prod => setWish(wishService.toggle(prod));
-  const checkout    = ()   => { alert('Gracias por tu compra!'); setCart(cartService.clear()); };
+  // Acceder al estado desde Redux
+  const cart = useSelector((state) => state.cart);
+  const wish = useSelector((state) => state.wish);
+  const user = useSelector((state) => state.user);
 
-  const handleAuth  = (u, p) => {
-    const res = userService.login(u, p);
-    if (!res.ok) { const r2 = userService.register(u, p); if (!r2.ok) return r2; }
-    setUser(userService.current());
+  // Handlers
+  const add = (prod) => dispatch(addToCart(prod));
+  const remove = (id) => dispatch(removeFromCart(id));
+  const toggle = (prod) => dispatch(toggleWish(prod));
+
+  const checkout = () => {
+    alert('Gracias por tu compra!');
+    dispatch(clearCart());
+  };
+
+  const handleAuth = async (u, p) => {
+    let result = await dispatch(loginUsuario({ username: u, password: p }));
+    if (loginUsuario.rejected.match(result)) {
+      result = await dispatch(registerUsuario({ username: u, password: p }));
+      if (registerUsuario.rejected.match(result)) return { ok: false, msg: result.payload };
+    }
     return { ok: true };
   };
-  const logout = () => { userService.logout(); setUser(null); };
 
-  /* ---------- render ---------- */
+  const logout = () => dispatch(logoutUser());
+
   return (
     <BrowserRouter>
       <NavBar
@@ -49,38 +68,26 @@ export default function App() {
       <Routes>
         <Route
           path="/"
-          element={
-            <HomePage
-              add={addToCart}
-              toggle={toggleWish}
-              wish={wish}
-            />
-          }
+          element={<HomePage add={add} toggle={toggle} wish={wish} />}
         />
         <Route
           path="/productos"
-          element={
-            <ProductosPage
-              add={addToCart}
-              toggle={toggleWish}
-              wish={wish}
-            />
-          }
+          element={<ProductosPage add={add} toggle={toggle} wish={wish} />}
         />
         <Route
           path="/carrito"
           element={
             <CarritoPage
               cart={cart}
-              remove={removeCart}
-              total={cartService.total()}
+              remove={remove}
+              total={cart.reduce((s, i) => s + i.price * i.qty, 0)}
               checkout={checkout}
             />
           }
         />
         <Route
           path="/wishlist"
-          element={<WishlistPage wish={wish} toggle={toggleWish} />}
+          element={<WishlistPage wish={wish} toggle={toggle} />}
         />
         <Route
           path="/login"

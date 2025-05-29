@@ -20,7 +20,7 @@ const LS = {
 /* Catálogo hard-coded  */
 
 export const PRODUCTS = [
-  {
+  /*{
     id: 1,
     nombre: '31 Hats NY Flames',
     descripcion: 'Caja, gorra, certificado y llavero',
@@ -59,7 +59,7 @@ export const PRODUCTS = [
     precio: 5499,
     categoriaNombre: 'tenis',
     imagenUrl: 'https://smileysneakers.com/cdn/shop/files/IMG-9213.jpg?v=1733619599&width=823'
-  },
+  },*/
 ];
 
 /* -------- Carrito -------- */
