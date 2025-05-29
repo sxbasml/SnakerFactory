@@ -2,8 +2,6 @@
 import React from 'react';
 
 export default function ProductoCard({ producto, inWish, add, toggle }) {
-  /* Alias: adaptamos los nombres de tu objeto
-     a los que usa productoService (id, img, title, price, cat) */
   const prod = {
     ...producto,
     id:    producto.id,
