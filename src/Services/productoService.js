@@ -2,7 +2,7 @@
 import api from './api';
 
 export const obtenerProductos = async (nombre = '') => {
-  const respuesta = await api.get(`/productos?nombre=${nombre}`);
+  const respuesta = await api.get(`/api/productos?nombre=${nombre}`);
   return respuesta.data;
 };
 
