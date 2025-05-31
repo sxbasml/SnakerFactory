@@ -19,7 +19,7 @@ export default function ProductoCard({ producto, inWish, add, toggle }) {
       margin: '10px',
       width: '250px'
     }}>
-      <img src={prod.img} alt={prod.title} style={{ width: '100%' }} />
+      <img src={prod.imagenURL} alt={prod.title} style={{ width: '100%' }} />
       <h3>{prod.title}</h3>
       <p>{producto.descripcion}</p>
       <p><strong>${prod.price}</strong></p>

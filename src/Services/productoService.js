@@ -1,4 +1,3 @@
-// src/Services/productoService.js
 import api from './api';
 
 export const obtenerProductos = async (nombre = '') => {
@@ -6,7 +5,6 @@ export const obtenerProductos = async (nombre = '') => {
   return respuesta.data;
 };
 
-// Carrito en localStorage
 const LS = {
   get: (k, fb) => JSON.parse(localStorage.getItem(k)) ?? fb,
   set: (k, v)   => localStorage.setItem(k, JSON.stringify(v)),
@@ -36,5 +34,13 @@ export const wishService = {
       ? wish = wish.filter(w => w.id !== p.id)
       : wish.push(p);
     LS.set('wish', wish); return [...wish];
+  }
+};
+
+// ✅ Pedido con usuarioId fijo (1)
+export const orderService = {
+  placeOrder: async (pedido) => {
+    const response = await api.post('/pedidos', pedido); // 🔧 corregido sin "/api"
+    return response.data;
   }
 };

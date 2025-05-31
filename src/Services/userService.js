@@ -1,30 +1,59 @@
-/*  Simple auth en localStorage (sin backend) */
-const LS = {
-  get: (k,f)=>JSON.parse(localStorage.getItem(k)) ?? f,
-  set: (k,v)=>localStorage.setItem(k,JSON.stringify(v)),
-};
-
-let user  = LS.get('user', null);
-let users = LS.get('users', []);
+// ✅ archivo src/Services/userService.js
+import api from './api';
 
 export const userService = {
-  current : () => user,
+  current() {
+    return JSON.parse(localStorage.getItem('user')) ?? null;
+  },
 
-  login(username, password){
-    const u = users.find(x=>x.username===username);
-    if (u && u.password===password){
-      user=u; LS.set('user',user); return {ok:true};
+  async login(username, password) {
+    try {
+      const res = await api.post('/api/usuarios/login', {
+        nombreUsuario: username,
+        contraseña: password
+      });
+
+      if (!res || !res.data) {
+        return { ok: false, msg: 'Credenciales inválidas' };
+      }
+
+      const user = {
+        usuarioId: res.data,           // Guardamos el ID como propiedad
+        nombreUsuario: username
+      };
+
+      localStorage.setItem('user', JSON.stringify(user));
+      return { ok: true, user };
+    } catch (error) {
+      return { ok: false, msg: 'Credenciales inválidas' };
     }
-    return {ok:false,msg:'Contraseña incorrecta'};
   },
 
-  register(username, password){
-    if (users.find(x=>x.username===username))
-      return {ok:false,msg:'Usuario ya existe'};
-    const u={username,password};
-    users.push(u); LS.set('users',users);
-    user=u; LS.set('user',user);  return {ok:true};
+  async register(username, password) {
+    try {
+      const res = await api.post('/api/usuarios', {
+        nombre: username,
+        apellidoPaterno: 'N/A',
+        apellidoMaterno: 'N/A',
+        nombreUsuario: username,
+        contraseña: password,
+        habilitado: true
+      });
+
+      if (!res || !res.data) {
+        return { ok: false, msg: 'No se pudo registrar el usuario' };
+      }
+
+      return await this.login(username, password);
+    } catch (error) {
+      if (error.response?.status === 409) {
+        return { ok: false, msg: 'El usuario ya existe' };
+      }
+      return { ok: false, msg: 'No se pudo registrar el usuario' };
+    }
   },
 
-  logout(){ user=null; LS.set('user',null); }
+  logout() {
+    localStorage.removeItem('user');
+  }
 };

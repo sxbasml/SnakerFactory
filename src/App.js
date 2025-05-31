@@ -47,12 +47,19 @@ export default function App() {
   };
 
   const handleAuth = async (u, p) => {
+  try {
     let result = await dispatch(loginUsuario({ username: u, password: p }));
     if (loginUsuario.rejected.match(result)) {
       result = await dispatch(registerUsuario({ username: u, password: p }));
-      if (registerUsuario.rejected.match(result)) return { ok: false, msg: result.payload };
+      if (registerUsuario.rejected.match(result)) {
+        const msg = result.payload || 'No se pudo registrar el usuario';
+        return { ok: false, msg };
+      }
     }
     return { ok: true };
+  } catch (e) {
+    return { ok: false, msg: 'Error inesperado en la autenticación' };
+  }
   };
 
   const logout = () => dispatch(logoutUser());
