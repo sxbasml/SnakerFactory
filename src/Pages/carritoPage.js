@@ -17,7 +17,7 @@ export default function CarritoPage({ cart, remove, total }) {
       total: cart.reduce((sum, p) => sum + p.price * p.qty, 0),
       estado: 'pendiente',
       detalles: cart.map(p => ({
-        productoId: p.id,
+        productoId: 1,
         cantidad: p.qty,
         precioUnitario: p.price
       }))

@@ -44,3 +44,11 @@ export const orderService = {
     return response.data;
   }
 };
+
+// EXTRA EXTRA EXTRA EXTRA EXTRA
+// Crear producto desde el frontend
+export const crearProducto = async (producto) => {
+  const respuesta = await api.post('/api/productos', producto);
+  return respuesta.data;
+};
+
